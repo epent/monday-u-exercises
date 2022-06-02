@@ -33,6 +33,11 @@ function checkItem(item) {
   }
 }
 
+function capitalize(string) {
+  const updatedString = string.charAt(0).toUpperCase() + string.slice(1);
+  return updatedString;
+}
+
 async function deletebyIndex(index) {
   const data = await readFromFile();
   const array = data.toString().split("\n");
@@ -77,8 +82,9 @@ program
         }
       });
     } else {
-      await writeToFile(item, true, "a+");
-      console.log(`Successfully added: ${item}`);
+      const capitalizedItem = capitalize(item);
+      await writeToFile(capitalizedItem, true, "a+");
+      console.log(`Successfully added: ${capitalizedItem}`);
     }
   });
 
@@ -109,6 +115,18 @@ program
   .description("Delete all items from the list")
   .action(async () => {
     writeToFile("");
+  });
+
+program
+  .command("sort")
+  .description("Sort all items by name")
+  .action(async () => {
+    const data = await readFromFile();
+    const array = data.toString().split("\n");
+
+    array.sort();
+
+    writeToFile(array.join("\n"));
   });
 
 program.parse();
