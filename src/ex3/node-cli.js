@@ -10,6 +10,15 @@ async function writeToFile(item) {
   }
 }
 
+async function readFromFile() {
+  try {
+    const data = await fs.readFile("src/ex3/test.txt");
+    return data;
+  } catch (err) {
+    console.log(err);
+  }
+}
+
 program
   .name("cli-todo-app")
   .description("CLI App to manage your everyday tasks")
@@ -22,6 +31,14 @@ program
   .action((item) => {
     console.log(`Result: ${item}`);
     writeToFile(item);
+  });
+
+program
+  .command("get")
+  .description("Get all items on the list")
+  .action(async () => {
+    const data = await readFromFile();
+    console.log(`ToDo list: ${data}`);
   });
 
 program.parse();
