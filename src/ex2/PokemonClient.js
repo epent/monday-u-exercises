@@ -11,7 +11,6 @@ class PokemonClient {
 
       return data;
     } catch (error) {
-      console.log(error);
       return `${pokemonId} Not found`;
     }
   }

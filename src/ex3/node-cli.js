@@ -33,6 +33,26 @@ function checkItem(item) {
   }
 }
 
+async function deletebyIndex(index) {
+  const data = await readFromFile();
+  const array = data.toString().split("\n");
+
+  array.splice(index, 1);
+
+  array.length > 0 ? writeToFile(array.join("\n")) : writeToFile("");
+}
+
+async function deleteByName(name) {
+  const data = await readFromFile();
+  const array = data.toString().split("\n");
+
+  const indexToDelete = array.findIndex((item) => {
+    return item === name;
+  });
+
+  await deletebyIndex(indexToDelete);
+}
+
 program
   .name("cli-todo-app")
   .description("CLI App to manage your everyday tasks")
@@ -49,7 +69,12 @@ program
       const allPromises = itemManager.createPromises(item.split(",")); // add promises to allPromises array
       const pokemonData = await Promise.all(allPromises); // fetch all pokemons simulteniously
       pokemonData.forEach(async (pokemon) => {
-        await writeToFile(`Catch ${pokemon.name}`, true, "a+");
+        if (pokemon.name) {
+          await writeToFile(`Catch ${pokemon.name}`, true, "a+");
+        } else {
+          const id = pokemon.split(" ")[0];
+          console.log(`Pokemon with ID ${id} was not found`);
+        }
       });
     } else {
       await writeToFile(item, true, "a+");
@@ -68,15 +93,15 @@ program
 program
   .command("delete")
   .description("Delete item from the list")
-  .argument("<number>", "item index")
-  .action(async (index) => {
-    const data = await readFromFile();
-    const array = data.toString().split("\n");
+  .argument("<string>", "item or itemIndex")
+  .action(async (input) => {
+    const isNumber = checkItem(input);
 
-    array.splice(index, 1);
-    array.pop();
-
-    array.length > 0 ? writeToFile(array.join("\n")) : writeToFile("");
+    if (isNumber) {
+      await deletebyIndex(input);
+    } else {
+      await deleteByName(input);
+    }
   });
 
 program.parse();
