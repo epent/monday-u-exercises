@@ -104,4 +104,11 @@ program
     }
   });
 
+program
+  .command("delete_all")
+  .description("Delete all items from the list")
+  .action(async () => {
+    writeToFile("");
+  });
+
 program.parse();
