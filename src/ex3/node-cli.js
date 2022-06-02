@@ -93,7 +93,11 @@ program
   .description("Get all items on the list")
   .action(async () => {
     const data = await readFromFile();
-    console.log(`ToDo list: \n${data}`);
+    if (data.length) {
+      console.log(`ToDo list: \n${data}`);
+    } else {
+      console.log(`Your ToDo list is empty!`);
+    }
   });
 
 program
@@ -105,8 +109,10 @@ program
 
     if (isNumber) {
       await deletebyIndex(input);
+      console.log(`Successfully deleted item at index ${input}`);
     } else {
       await deleteByName(input);
+      console.log(`Successfully deleted item: ${input}`);
     }
   });
 
@@ -115,6 +121,7 @@ program
   .description("Delete all items from the list")
   .action(async () => {
     writeToFile("");
+    console.log(`Successfully deleted all items`);
   });
 
 program
@@ -126,7 +133,10 @@ program
 
     array.sort();
 
-    writeToFile(array.join("\n"));
+    const sortedArray = array.join("\n");
+    writeToFile(sortedArray);
+    console.log(`Successfully sorted all items by name:`);
+    console.log(`${sortedArray}`);
   });
 
 program.parse();
