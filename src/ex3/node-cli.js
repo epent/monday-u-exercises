@@ -1,7 +1,7 @@
 import fs from "fs/promises";
 import { Command } from "commander";
 
-import { pokemonClient } from "../ex2/PokemonClient.js";
+import { itemManager } from "../ex2/ItemManager.js";
 
 const program = new Command();
 
@@ -23,13 +23,13 @@ async function readFromFile() {
   }
 }
 
-async function addPokemon(pokemonId) {
-  try {
-    const pokemon = pokemonClient.fetchPokemon(pokemonId);
+function checkItem(item) {
+  const inputArray = item.split(",");
 
-    return pokemon;
-  } catch (err) {
-    console.log(err);
+  if (isNaN(+inputArray[0])) {
+    return false;
+  } else {
+    return true;
   }
 }
 
@@ -43,16 +43,18 @@ program
   .description("Add item to the list")
   .argument("<string>", "item")
   .action(async (item) => {
-    let itemAdded;
-    if (isNaN(+item)) {
-      itemAdded = item;
-    } else {
-      const pokemon = await addPokemon(+item);
-      itemAdded = `Catch ${pokemon.name}`;
-    }
+    const isPokemon = checkItem(item);
 
-    await writeToFile(itemAdded, true, "a+");
-    console.log(`Successfully added: ${itemAdded}`);
+    if (isPokemon) {
+      const allPromises = itemManager.createPromises(item.split(",")); // add promises to allPromises array
+      const pokemonData = await Promise.all(allPromises); // fetch all pokemons simulteniously
+      pokemonData.forEach(async (pokemon) => {
+        await writeToFile(`Catch ${pokemon.name}`, true, "a+");
+      });
+    } else {
+      await writeToFile(item, true, "a+");
+      console.log(`Successfully added: ${item}`);
+    }
   });
 
 program
