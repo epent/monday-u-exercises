@@ -1,5 +1,8 @@
 import fs from "fs/promises";
 import { Command } from "commander";
+
+import { pokemonClient } from "../ex2/PokemonClient.js";
+
 const program = new Command();
 
 async function writeToFile(item, addNewLine, flag) {
@@ -20,6 +23,16 @@ async function readFromFile() {
   }
 }
 
+async function addPokemon(pokemonId) {
+  try {
+    const pokemon = pokemonClient.fetchPokemon(pokemonId);
+
+    return pokemon;
+  } catch (err) {
+    console.log(err);
+  }
+}
+
 program
   .name("cli-todo-app")
   .description("CLI App to manage your everyday tasks")
@@ -29,9 +42,17 @@ program
   .command("add")
   .description("Add item to the list")
   .argument("<string>", "item")
-  .action((item) => {
-    console.log(`Successfully added: ${item}`);
-    writeToFile(item, true, "a+");
+  .action(async (item) => {
+    let itemAdded;
+    if (isNaN(+item)) {
+      itemAdded = item;
+    } else {
+      const pokemon = await addPokemon(+item);
+      itemAdded = `Catch ${pokemon.name}`;
+    }
+
+    await writeToFile(itemAdded, true, "a+");
+    console.log(`Successfully added: ${itemAdded}`);
   });
 
 program
