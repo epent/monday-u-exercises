@@ -2,7 +2,7 @@ import inquirer from "inquirer";
 
 import {
   addItem,
-  getItem,
+  getItems,
   deleteItem,
   deleteAllItems,
   sortItems,
@@ -26,7 +26,7 @@ const questions = [
   {
     type: "input",
     name: "item",
-    message: "Type your new todo or pokemon id",
+    message: "Type your new todo or pokemon id/ids",
     when: (answer) => answer.command === "add new item",
   },
   {
@@ -50,7 +50,7 @@ async function callInquirer() {
       addItem(answer.item);
       break;
     case "get all items":
-      getItem();
+      getItems();
       break;
     case "delete item by index":
       deleteItem(answer.delete_index);

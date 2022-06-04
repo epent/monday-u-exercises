@@ -2,7 +2,7 @@ import { Command } from "commander";
 
 import {
   addItem,
-  getItem,
+  getItems,
   deleteItem,
   deleteAllItems,
   sortItems,
@@ -24,7 +24,7 @@ program
 program
   .command("get")
   .description("Get all items on the list")
-  .action(async () => await getItem());
+  .action(async () => await getItems());
 
 program
   .command("delete")
