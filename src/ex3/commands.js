@@ -17,26 +17,26 @@ export async function addItem(item) {
     pokemonData.forEach(async (pokemon) => {
       if (pokemon.name) {
         await writeToFile(`Catch ${pokemon.name}`, true, "a+");
-        console.log(`Successfully added: Catch ${pokemon.name}`);
+        console.log(`\n\nSuccessfully added: Catch ${pokemon.name}`);
       } else {
         const id = pokemon.split(" ")[0];
-        console.log(`Pokemon with ID ${id} was not found`);
+        console.log(`\n\nPokemon with ID ${id} was not found`);
       }
     });
   } else {
     const capitalizedItem = capitalize(item);
     await writeToFile(capitalizedItem, true, "a+");
-    console.log(`Successfully added: ${capitalizedItem}`);
+    console.log(`\n\nSuccessfully added: ${capitalizedItem}`);
   }
 }
 
-export async function getItem() {
+export async function getItems() {
   const data = await readFromFile();
 
   if (data.length) {
-    console.log(`ToDo list: \n${data}`);
+    console.log(`\n\nToDo list: \n${data}`);
   } else {
-    console.log(`Your ToDo list is empty!`);
+    console.log(`\n\nYour ToDo list is empty!`);
   }
 }
 
@@ -53,12 +53,12 @@ export async function deleteItem(input) {
     ? await writeToFile(updatedArray.join("\n"))
     : await writeToFile("");
 
-  console.log(`Successfully deleted item: ${input}`);
+  console.log(`\n\nSuccessfully deleted item: ${input}`);
 }
 
 export function deleteAllItems() {
   writeToFile("");
-  console.log(`Successfully deleted all items`);
+  console.log(`\n\nSuccessfully deleted all items`);
 }
 
 export async function sortItems() {
@@ -69,6 +69,6 @@ export async function sortItems() {
 
   const sortedArray = array.join("\n");
   writeToFile(sortedArray);
-  console.log(`Successfully sorted all items by name:`);
+  console.log(`\n\nSuccessfully sorted all items by name:`);
   console.log(`${sortedArray}`);
 }
