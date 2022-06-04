@@ -7,6 +7,7 @@ import {
   deleteByName,
 } from "./utils.js";
 import { itemManager } from "../ex2/ItemManager.js";
+import { success, error, blue } from "./chalk.js";
 
 export async function addItem(item) {
   const isPokemon = checkItem(item);
@@ -17,16 +18,16 @@ export async function addItem(item) {
     pokemonData.forEach(async (pokemon) => {
       if (pokemon.name) {
         await writeToFile(`Catch ${pokemon.name}`, true, "a+");
-        console.log(`\n\nSuccessfully added: Catch ${pokemon.name}`);
+        console.log(success(`\n\nSuccessfully added: Catch ${pokemon.name}`));
       } else {
         const id = pokemon.split(" ")[0];
-        console.log(`\n\nPokemon with ID ${id} was not found`);
+        console.log(error(`\n\nPokemon with ID ${id} was not found`));
       }
     });
   } else {
     const capitalizedItem = capitalize(item);
     await writeToFile(capitalizedItem, true, "a+");
-    console.log(`\n\nSuccessfully added: ${capitalizedItem}`);
+    console.log(success(`\n\nSuccessfully added: ${capitalizedItem}`));
   }
 }
 
@@ -34,9 +35,9 @@ export async function getItems() {
   const data = await readFromFile();
 
   if (data.length) {
-    console.log(`\n\nToDo list: \n${data}`);
+    console.log(blue(`\n\nToDo list: \n${data}`));
   } else {
-    console.log(`\n\nYour ToDo list is empty!`);
+    console.log(error(`\n\nYour ToDo list is empty!`));
   }
 }
 
@@ -53,12 +54,12 @@ export async function deleteItem(input) {
     ? await writeToFile(updatedArray.join("\n"))
     : await writeToFile("");
 
-  console.log(`\n\nSuccessfully deleted item: ${input}`);
+  console.log(success(`\n\nSuccessfully deleted item: ${input}`));
 }
 
 export function deleteAllItems() {
   writeToFile("");
-  console.log(`\n\nSuccessfully deleted all items`);
+  console.log(success(`\n\nSuccessfully deleted all items`));
 }
 
 export async function sortItems() {
@@ -69,6 +70,6 @@ export async function sortItems() {
 
   const sortedArray = array.join("\n");
   writeToFile(sortedArray);
-  console.log(`\n\nSuccessfully sorted all items by name:`);
-  console.log(`${sortedArray}`);
+  console.log(success(`\n\nSuccessfully sorted all items by name:`));
+  console.log(blue(`${sortedArray}`));
 }
