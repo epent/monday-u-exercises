@@ -23,7 +23,7 @@ program
   .description("Start the app, it will promp you with questions")
   .action(async () => await startInquirer());
 
-//to use Commander.js
+//to not use Inquirer.js
 program
   .command("add")
   .description("Add item to the list")
