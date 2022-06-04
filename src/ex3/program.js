@@ -1,64 +1,16 @@
-import fs from "fs/promises";
 import { Command } from "commander";
 
 import { itemManager } from "../ex2/ItemManager.js";
+import {
+  capitalize,
+  checkItem,
+  convertToArray,
+  deletebyIndex,
+  deleteByName,
+} from "./utils.js";
+import { writeToFile, readFromFile } from "./fs.js";
 
 const program = new Command();
-
-async function writeToFile(item, addNewLine, flag) {
-  try {
-    const newLine = addNewLine ? "\n" : "";
-    await fs.writeFile("src/ex3/ItemList.txt", `${item}${newLine}`, {
-      flag: flag,
-    });
-  } catch (err) {
-    console.log(err);
-  }
-}
-
-async function readFromFile() {
-  try {
-    const data = await fs.readFile("src/ex3/ItemList.txt");
-    return data;
-  } catch (err) {
-    console.log(err);
-  }
-}
-
-function checkItem(item) {
-  const inputArray = item.split(",");
-
-  if (isNaN(+inputArray[0])) {
-    return false;
-  } else {
-    return true;
-  }
-}
-
-function capitalize(string) {
-  const updatedString = string.charAt(0).toUpperCase() + string.slice(1);
-  return updatedString;
-}
-
-async function deletebyIndex(array, index) {
-  array.splice(index, 1);
-
-  array.length > 0 ? writeToFile(array.join("\n")) : writeToFile("");
-}
-
-async function deleteByName(array, name) {
-  const indexToDelete = array.findIndex((item) => {
-    return item === name;
-  });
-
-  await deletebyIndex(array, indexToDelete);
-}
-
-async function getDataAsArray() {
-  const data = await readFromFile();
-  const array = data.toString().split("\n");
-  return array;
-}
 
 program
   .name("cli-todo-app")
@@ -109,15 +61,18 @@ program
   .argument("<string>", "item or itemIndex")
   .action(async (input) => {
     const isNumber = checkItem(input);
-    const array = await getDataAsArray();
+    const data = await readFromFile();
+    const array = convertToArray(data);
 
-    if (isNumber) {
-      await deletebyIndex(array, input);
-      console.log(`Successfully deleted item at index ${input}`);
-    } else {
-      await deleteByName(array, input);
-      console.log(`Successfully deleted item: ${input}`);
-    }
+    const updatedArray = isNumber
+      ? deletebyIndex(array, input)
+      : deleteByName(array, input);
+
+    updatedArray.length > 0
+      ? await writeToFile(updatedArray.join("\n"))
+      : await writeToFile("");
+
+    console.log(`Successfully deleted item: ${input}`);
   });
 
 program
