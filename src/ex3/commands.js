@@ -73,7 +73,7 @@ export async function sortItems() {
   const array = data.toString().split("\n");
 
   array.sort();
-  array.unshift();
+  array.shift();
   array.push("");
 
   const sortedArray = array.join("\n");
