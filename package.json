@@ -1,8 +1,11 @@
 {
-  "name": "monday-u-exercises",
+  "name": "cli-todo-app-epent",
   "description": "Welcome to monday-u official github repository! We are very excited to have you here!   This is going to be so much fun! Here are a few general details:",
   "version": "1.0.0",
   "main": "index.js",
+  "bin": {
+    "cli-todo-app": "src/ex3/commander.js"
+  },
   "type": "module",
   "scripts": {
     "start": "node src/ex3/commander",
@@ -12,7 +15,7 @@
     "type": "git",
     "url": "git+https://github.com/epent/monday-u-exercises.git"
   },
-  "author": "",
+  "author": "Elena Pentina",
   "license": "ISC",
   "bugs": {
     "url": "https://github.com/epent/monday-u-exercises/issues"
