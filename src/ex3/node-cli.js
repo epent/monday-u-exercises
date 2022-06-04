@@ -40,24 +40,24 @@ function capitalize(string) {
   return updatedString;
 }
 
-async function deletebyIndex(index) {
-  const data = await readFromFile();
-  const array = data.toString().split("\n");
-
+async function deletebyIndex(array, index) {
   array.splice(index, 1);
 
   array.length > 0 ? writeToFile(array.join("\n")) : writeToFile("");
 }
 
-async function deleteByName(name) {
-  const data = await readFromFile();
-  const array = data.toString().split("\n");
-
+async function deleteByName(array, name) {
   const indexToDelete = array.findIndex((item) => {
     return item === name;
   });
 
-  await deletebyIndex(indexToDelete);
+  await deletebyIndex(array, indexToDelete);
+}
+
+async function getDataAsArray() {
+  const data = await readFromFile();
+  const array = data.toString().split("\n");
+  return array;
 }
 
 program
@@ -109,12 +109,13 @@ program
   .argument("<string>", "item or itemIndex")
   .action(async (input) => {
     const isNumber = checkItem(input);
+    const array = await getDataAsArray();
 
     if (isNumber) {
-      await deletebyIndex(input);
+      await deletebyIndex(array, input);
       console.log(`Successfully deleted item at index ${input}`);
     } else {
-      await deleteByName(input);
+      await deleteByName(array, input);
       console.log(`Successfully deleted item: ${input}`);
     }
   });
