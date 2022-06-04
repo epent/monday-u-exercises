@@ -43,7 +43,7 @@ const questions = [
   },
 ];
 
-async function callInquirer() {
+export async function startInquirer() {
   const answer = await inquirer.prompt(questions);
   switch (answer.command) {
     case "add new item":
@@ -67,7 +67,5 @@ async function callInquirer() {
     case "exit":
       return;
   }
-  return callInquirer();
+  return startInquirer();
 }
-
-callInquirer();

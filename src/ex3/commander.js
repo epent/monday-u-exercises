@@ -8,6 +8,8 @@ import {
   sortItems,
 } from "./commands.js";
 
+import { startInquirer } from "./inquirer.js";
+
 const program = new Command();
 
 program
@@ -15,6 +17,13 @@ program
   .description("CLI App to manage your everyday tasks")
   .version("1.0.0");
 
+// to use Inquirer.js
+program
+  .command("start")
+  .description("Start the app, it will promp you with questions")
+  .action(async () => await startInquirer());
+
+//to use Commander.js
 program
   .command("add")
   .description("Add item to the list")
