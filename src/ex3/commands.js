@@ -50,11 +50,17 @@ export async function deleteItem(input) {
     ? deletebyIndex(array, input)
     : deleteByName(array, input);
 
-  updatedArray.length > 0
-    ? await writeToFile(updatedArray.join("\n"))
-    : await writeToFile("");
+  if (array.length - updatedArray.length > 0) {
+    updatedArray.length > 0
+      ? await writeToFile(updatedArray.join("\n"))
+      : await writeToFile("");
 
-  console.log(success(`\n\nSuccessfully deleted item: ${input}`));
+    console.log(success(`\n\nSuccessfully deleted item: ${input}`));
+  } else {
+    console.log(
+      error(`\n\nThis item was not found in your list: ${input}. Try again!`)
+    );
+  }
 }
 
 export function deleteAllItems() {
@@ -67,9 +73,12 @@ export async function sortItems() {
   const array = data.toString().split("\n");
 
   array.sort();
+  array.unshift();
+  array.push("");
 
   const sortedArray = array.join("\n");
   writeToFile(sortedArray);
+
   console.log(success(`\n\nSuccessfully sorted all items by name:`));
   console.log(blue(`${sortedArray}`));
 }

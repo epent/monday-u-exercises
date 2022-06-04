@@ -19,8 +19,10 @@ export function convertToArray(data) {
 }
 
 export function deletebyIndex(array, index) {
-  array.splice(index, 1);
-  return array;
+  const copiedArray = [...array];
+  copiedArray.splice(index, 1);
+
+  return copiedArray;
 }
 
 export function deleteByName(array, name) {
@@ -28,5 +30,5 @@ export function deleteByName(array, name) {
     return item === name;
   });
 
-  return deletebyIndex(array, indexToDelete);
+  return indexToDelete === -1 ? array : deletebyIndex(array, indexToDelete);
 }
