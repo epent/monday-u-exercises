@@ -1,4 +1,9 @@
 import { pokemonClient } from "./PokemonClient.js";
+import {
+  toggleFooter,
+  removeItemFromList,
+  removePokemonFromList,
+} from "./util.js";
 
 class ItemManager {
   constructor() {
@@ -14,13 +19,17 @@ class ItemManager {
     const item = input.value;
     const inputArray = item.split(",");
 
-    if (!isNaN(+inputArray[0])) {
-      // if first item input is a number - add pokemon
-      await this.addPokemon(inputArray);
-    } else {
-      // if input is a string - add todo
-      this.addToDo(item);
-    }
+    let pokemonArray = [];
+
+    inputArray.forEach((elm) => {
+      if (isNaN(elm)) {
+        this.addToDo(elm);
+      } else {
+        pokemonArray.push(elm);
+      }
+    });
+
+    await this.addPokemon(pokemonArray);
 
     //clear input
     this.clearInputField();
@@ -40,34 +49,33 @@ class ItemManager {
     // fetch all pokemons simulteniously
     const pokemonData = await Promise.all(allPromises);
 
+    const copyInputArray = [...inputArray];
+
     //filter out new pokemons
     const newPokemons = pokemonData.filter((pokemon) => {
-      if (this.pokemons.has(`${pokemon.name}`))
-        alert(`Pokemon with ID ${pokemon.id} was alrady added!`); //alert existing pokemons
-      return !this.pokemons.has(`${pokemon.name}`);
+      if (pokemon) {
+        const index = copyInputArray.findIndex((elm) => elm == pokemon.id);
+        copyInputArray.splice(index, 1);
+
+        const hasName = this.pokemons.has(pokemon.name);
+        if (hasName) alert(`Pokemon with ID ${pokemon.id} was alrady added!`); //alert existing pokemons
+        return !hasName;
+      }
     });
 
     // add new pokemons to list of pokemons
     const pokemonNames = newPokemons.map((pokemon) => {
-      if (pokemon.name) {
-        this.pokemons.add(`${pokemon.name}`);
-        return pokemon.name;
-      } else {
-        return pokemon;
-      }
+      this.pokemons.add(pokemon.name);
+      return pokemon.name;
     });
 
     // push pokemons to todo list
     pokemonNames.forEach((name) => {
-      const id = name.split(" ")[0];
+      this.itemList.push(`Catch ${name}`);
+    });
 
-      if (!isNaN(+id)) {
-        //if first element is a number - it's id of a not found pokemon
-        this.itemList.push(`Pokemon with ID ${id} was not found`);
-      } else {
-        //if first element is not a number - it's name of a found pokemon
-        this.itemList.push(`Catch ${name}`);
-      }
+    copyInputArray.forEach((id) => {
+      this.itemList.push(`Pokemon with ID ${id} was not found`);
     });
   }
 
@@ -90,12 +98,8 @@ class ItemManager {
     const pokemonName = itemId[1];
     const item = itemId.join(" ");
 
-    const itemIndex = this.itemList.findIndex((listItem) => {
-      return listItem === item;
-    });
-
-    this.itemList.splice(itemIndex, 1);
-    this.pokemons.delete(pokemonName);
+    removeItemFromList(this.itemList, item);
+    removePokemonFromList(this.pokemons, pokemonName);
 
     this.renderItems();
   }
@@ -108,7 +112,7 @@ class ItemManager {
   }
 
   renderItems(current) {
-    this.toggleFooter();
+    toggleFooter(this.itemList);
 
     // clear list innerHTML
     const list = document.querySelector("#list");
@@ -122,42 +126,34 @@ class ItemManager {
     });
   }
 
-  toggleFooter() {
-    const addItemButton = document.querySelector("#list-item-submit");
-    const clearAllButton = document.querySelector("#clear-all-button");
-    const sortByNameButton = document.querySelector("#sort-by-name-button");
-
-    if (this.itemList.length === 0) {
-      addItemButton.classList.add("hithere"); //add AddButton animation
-      clearAllButton.classList.add("hidden"); //hide ClearAll button
-      sortByNameButton.classList.add("hidden"); //hide Sort button
-    } else {
-      addItemButton.classList.remove("hithere"); //remove AddButton animation
-      clearAllButton.classList.remove("hidden"); //show ClearAll button
-      sortByNameButton.classList.remove("hidden"); //show Sort button
-    }
-  }
-
   createItemElement(input, current) {
     const itemId = input.split(" ").join("-");
 
-    //create list element, add class, innerHTML, eventListener
+    const liElm = this.createListElement(itemId, input, current);
+    const deleteButton = this.createDeleteButton(itemId, liElm);
+
+    liElm.appendChild(deleteButton);
+
+    return liElm;
+  }
+
+  createListElement(itemId, input, current) {
     const liElm = document.createElement("li");
-    liElm.setAttribute("id", `${itemId}`);
+    liElm.setAttribute("id", itemId);
     liElm.classList.add("list-item");
     if (input === current) liElm.classList.add("grow");
     liElm.innerHTML = input;
     liElm.addEventListener("click", () => alert(`Task: ${input}`));
+    return liElm;
+  }
 
-    //create delete button, add id, class, src and clickListener
+  createDeleteButton(itemId, liElm) {
     const deleteButton = document.createElement("img");
     deleteButton.setAttribute("id", `${itemId}-delete`);
     deleteButton.classList.add("list-item-delete-button");
     deleteButton.src = "../images/delete_icon.svg";
     deleteButton.addEventListener("click", (e) => this.removeItem(e, liElm));
-    liElm.appendChild(deleteButton);
-
-    return liElm;
+    return deleteButton;
   }
 
   clearInputField() {
@@ -171,7 +167,7 @@ class ItemManager {
   }
 
   capitalize(string) {
-    const updatedString = string.charAt(0).toUpperCase() + string.slice(1);
+    const updatedString = `${string.charAt(0).toUpperCase()}${string.slice(1)}`;
     return updatedString;
   }
 }

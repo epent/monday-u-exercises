@@ -1,3 +1,5 @@
+import fetch from "node-fetch";
+
 class PokemonClient {
   constructor() {}
 
@@ -11,8 +13,7 @@ class PokemonClient {
 
       return data;
     } catch (error) {
-      console.log(error);
-      return `${pokemonId} Not found`;
+      // console.log(error);
     }
   }
 }
