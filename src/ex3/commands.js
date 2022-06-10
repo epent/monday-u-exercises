@@ -10,24 +10,44 @@ import { itemManager } from "../ex2/ItemManager.js";
 import { success, error, blue } from "./chalk.js";
 
 export async function addItem(item) {
-  const isPokemon = checkItem(item);
+  let pokemonArray = [];
 
-  if (isPokemon) {
-    const allPromises = itemManager.createPromises(item.split(",")); // add promises to allPromises array
-    const pokemonData = await Promise.all(allPromises); // fetch all pokemons simulteniously
-    pokemonData.forEach(async (pokemon) => {
-      if (pokemon.name) {
-        await writeToFile(`Catch ${pokemon.name}`, true, "a+");
-        console.log(success(`\n\nSuccessfully added: Catch ${pokemon.name}`));
-      } else {
-        const id = pokemon.split(" ")[0];
-        console.log(error(`\n\nPokemon with ID ${id} was not found`));
-      }
-    });
-  } else {
+  const inputArray = item.split(",");
+  inputArray.forEach(async (elm) => {
+    if (isNaN(elm)) {
+      await addToDo(elm);
+    } else {
+      pokemonArray.push(elm);
+    }
+  });
+
+  await addPokemon(pokemonArray);
+
+  async function addToDo(item) {
     const capitalizedItem = capitalize(item);
     await writeToFile(capitalizedItem, true, "a+");
     console.log(success(`\n\nSuccessfully added: ${capitalizedItem}`));
+  }
+
+  async function addPokemon(pokemonArray) {
+    const allPromises = itemManager.createPromises(pokemonArray); // add promises to allPromises array
+    const pokemonData = await Promise.all(allPromises); // fetch all pokemons simulteniously
+
+    const copyPokemonArray = [...pokemonArray];
+
+    pokemonData.forEach((pokemon) => {
+      if (pokemon) {
+        writeToFile(`Catch ${pokemon.name}`, true, "a+");
+        console.log(success(`\n\nSuccessfully added: Catch ${pokemon.name}`));
+
+        const index = copyPokemonArray.findIndex((elm) => elm == pokemon.id);
+        copyPokemonArray.splice(index, 1);
+      }
+    });
+
+    copyPokemonArray.forEach((id) => {
+      console.log(error(`\n\nPokemon with ID ${id} was not found`));
+    });
   }
 }
 
