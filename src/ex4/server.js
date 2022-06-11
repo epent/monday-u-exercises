@@ -1,7 +1,7 @@
 // Express boilerplate, hosting the `dist` file, connecting to the routes
 
-import { app } from "./app";
-import { http } from "htpp";
+import app from "./app.js";
+import http from "http";
 
 const port = 8080;
 
