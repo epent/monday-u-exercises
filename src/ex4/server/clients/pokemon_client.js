@@ -1,4 +1,4 @@
-const axios = require("axios").default;
+import axios from "axios";
 
 class PokemonClient {
   constructor() {}
@@ -18,4 +18,6 @@ class PokemonClient {
   }
 }
 
-export const pokemonClient = new PokemonClient();
+const pokemonClient = new PokemonClient();
+
+export default pokemonClient;
