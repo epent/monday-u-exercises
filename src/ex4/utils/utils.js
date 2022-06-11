@@ -1,27 +1,21 @@
-export function toggleFooter(itemList) {
-  const addItemButton = document.querySelector("#list-item-submit");
-  const clearAllButton = document.querySelector("#clear-all-button");
-  const sortByNameButton = document.querySelector("#sort-by-name-button");
+import fs from "fs/promises";
 
-  if (itemList.length === 0) {
-    addItemButton.classList.add("hithere"); //add AddButton animation
-    clearAllButton.classList.add("hidden"); //hide ClearAll button
-    sortByNameButton.classList.add("hidden"); //hide Sort button
-  } else {
-    addItemButton.classList.remove("hithere"); //remove AddButton animation
-    clearAllButton.classList.remove("hidden"); //show ClearAll button
-    sortByNameButton.classList.remove("hidden"); //show Sort button
+export async function writeToFile(item, addNewLine, flag) {
+  try {
+    const newLine = addNewLine ? "\n" : "";
+    await fs.writeFile("src/ex4/ItemList.txt", `${item}${newLine}`, {
+      flag: flag,
+    });
+  } catch (err) {
+    console.log(err);
   }
 }
 
-export function removeItemFromList(itemList, item) {
-  const itemIndex = itemList.findIndex((listItem) => {
-    return listItem === item;
-  });
-
-  itemList.splice(itemIndex, 1);
-}
-
-export function removePokemonFromList(pokemons, pokemonName) {
-  pokemons.delete(pokemonName);
+export async function readFromFile() {
+  try {
+    const data = await fs.readFile("src/ex4/ItemList.txt");
+    return data;
+  } catch (err) {
+    console.log(err);
+  }
 }
