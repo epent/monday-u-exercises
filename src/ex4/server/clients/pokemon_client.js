@@ -1,12 +1,11 @@
-// The Pokemon Client (using axios) goes here
-import fetch from "node-fetch";
+const axios = require("axios").default;
 
 class PokemonClient {
   constructor() {}
 
   async fetchPokemon(pokemonId) {
     try {
-      const response = await fetch(
+      const response = await axios.get(
         `https://pokeapi.co/api/v2/pokemon/${pokemonId}`
       );
 
