@@ -1,5 +1,4 @@
-import { itemManager } from "../server/services/item_manager";
-import { readFromFile } from "../utils/utils";
+import ItemClient from "./clients/item_client.js";
 
 class Main {
   constructor() {
@@ -10,7 +9,7 @@ class Main {
     const addItemButton = document.getElementById("list-item-submit");
     addItemButton.addEventListener("click", this.addItem);
 
-    await this.renderItems(); // this will make it so that any time you refresh the page you'll see the items already in your todo list
+    // await this.renderItems(); // this will make it so that any time you refresh the page you'll see the items already in your todo list
   };
 
   addItem = async () => {
@@ -19,57 +18,57 @@ class Main {
 
     let pokemonArray = [];
 
-    inputArray.forEach((elm) => {
+    inputArray.forEach(async (elm) => {
       if (isNaN(elm)) {
-        itemManager.addToDo(elm);
+        await this.itemClient.addToDo(elm);
       } else {
         pokemonArray.push(elm);
       }
     });
 
-    await itemManager.addPokemon(pokemonArray);
+    if (pokemonArray.length > 0) {
+      await this.itemClient.addPokemon(pokemonArray);
+    }
 
     //clear input
     this._clearInputField();
 
     // render the list
-    this.renderItems(this.itemList.at(-1));
+    // await this.renderItems(this.itemList.at(-1));
   };
 
-  removeItem = (e, liElm) => {
-    const data = await readFromFile();
-    const array = convertToArray(data);
+  removeItem = async (e, liElm) => {
+    e.stopPropagation();
 
-    itemManager.removeItem(e, liElm, array);
-    this.renderItems();
+    await this.itemClient.removeItem(e, liElm);
+    await this.renderItems();
   };
 
-  removeAll = () => {
-    itemManager.removeAll();
-    this.renderItems();
+  removeAll = async () => {
+    await this.itemClient.removeAll();
+    await this.renderItems();
   };
 
-  sortByName = () => {
-    const data = await readFromFile();
-    const array = data.toString().split("\n");
-
-    itemManager.sortByName(array);
-    this.renderItems();
+  sortByName = async () => {
+    await this.itemClient.sortByName();
+    await this.renderItems();
   };
 
   renderItems = async (current) => {
-    _toggleFooter(this.itemList);
+    const items = await this.itemClient.getItems();
 
-    const list = document.getElementById("list");
-    list.innerHTML = "";
+    this._toggleFooter(items);
 
-    const items = await readFromFile();
+    if (items && items.length > 0) {
+      const list = document.getElementById("list");
+      list.innerHTML = "";
 
-    items.forEach((item) => {
-      const itemNode = this._createItemElement(item, current);
+      items.forEach((item) => {
+        const itemNode = this._createItemElement(item, current);
 
-      list.appendChild(itemNode);
-    });
+        list.appendChild(itemNode);
+      });
+    }
   };
 
   _toggleFooter = (itemList) => {
